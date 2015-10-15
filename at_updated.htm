@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="apiTestApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+</head>
+    <style>
+    .push-it-down {
+        margin-top: 60px;
+    }
+	.alert {
+		overflow: scroll;
+	}
+	.someTopSpace {
+		margin-top: 10px;
+	}
+    </style>
+<body ng-controller="apiTestController">
+    <span us-spinner="{radius:30, width:8, length: 16}"></span>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">{{title}}</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container push-it-down">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                POST /Account/Token
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-Account-Token"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetToken();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Token
+                </button>
+				<div>
+					<label>UserType Id:</label>
+					<input ng-model="userTypeId" class="form-control input-sm" type="text">
+					<label>Hospital Id:</label>
+					<input ng-model="hospitalId" class="form-control input-sm" type="text">
+					<label>Email Id:</label>
+					<input ng-model="emailAddress" class="form-control input-sm" type="text">
+						<label>Password:</label>
+					<input ng-model="userPassword" class="form-control input-sm" type="text">
+				</div>	
+				<div class="alert {{tokenStatus}} someTopSpace" role="alert">{{accessToken}}</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                /v2/hospitals?patient={emailAddress}
+                <<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-hospitals_patient"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetFacilitiesList();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Patient Facilities List
+                </button>
+				<div>
+					<label>Email Address:</label>
+					<input ng-model="emailAddress" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{patientFacilitiesList}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				POST /v2/patients/{patientEmail}/mail?type={emailType}
+				<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-v2-patients-email-mail_type"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+			</div>
+			<div class="panel-body" id="ConsultationSave">
+				<button type="button" class="btn btn-default btn-lg" ng-click="doPostSendPasswordResetEmail();">
+				  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Send Password Reset Email
+				</button>
+				<div>
+					<label>Patient Email:</label>
+					<input ng-model="patientEmail" class="form-control input-sm" type="text">
+					<label>Email Type:</label>
+					<input ng-model="emailType" class="form-control input-sm" type="text">					
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{PasswordResetEmail}}</textarea>
+					</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				/api/v2/patients?include=AccountDetails,Physician,Pharmacy,Anatomy,Addresses,Consultations
+				<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-patients_include"></span>Help</a>
+			</div>
+			<div class="panel-body" >
+				<button type="button" class="btn btn-default btn-lg" ng-click="doGetPatientProfiles();">
+				  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Patient Profiles
+				</button>
+				<div>
+					<!--<label>Patient ID:</label>
+					<input ng-model="otherPatientId" class="form-control input-sm" type="text">-->				
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{patientInfomation}}</textarea>
+					</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				GET /v2/patients/familyprofiles/{patientID}dependents
+				<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-patients-familyprofiles-dependents"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+			</div>
+			<div class="panel-body" id="ConsultationSave">
+				<button type="button" class="btn btn-default btn-lg" ng-click="doGetRelatedPatientProfiles();">
+				  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Related Patient Profiles
+				</button>
+				<div>
+					<label>Patient ID:</label>
+					<input ng-model="otherPatientId" class="form-control input-sm" type="text">				
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{RelatedPatientProfiles}}</textarea>
+					</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET v2/patients/scheduledconsultations?id={patientId}
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-patients-scheduledconsultations_id"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetScheduledConsulatation();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Patient Scheduled Consultation List / Consultation Copay Amount
+                </button>
+				<div>
+					<label>Patient ID:</label>
+					<input ng-model="patientId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{scheduledConsultationList}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET /v2/patients/consultations/{consultationId}/all
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-patients-consultations-consultationId-all"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetExistingConsulatation();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Existing Consultation
+                </button>
+				<div>
+					<label>Consultation ID:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{existingConsultation}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+               GET /codesets?hospitalId={hospitalId}&fields={fields}
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-codesets_hospitalId_fields"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetCodesSet();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Codes Set
+                </button>
+				<div>
+					<label>Hospital ID:</label>
+					<input ng-model="hospitalId" class="form-control input-sm" type="text">
+                                        <label>Codes</label>
+                                        <input ng-model="codesFields" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{hospitalCodesList}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+               GET /HealthPlan?patientId={patientId}
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-healthplan_patientId"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientHealthPlanList">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetPatientHealthPlansList();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Patient Health Plans
+                </button>
+				<div>
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{patientHealthPlanList}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		<!--
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Consultation Copay Amount
+				<a target="_blank" href=""><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+			</div>
+			<div class="panel-body" id="ConsultationSave">
+				<button type="button" class="btn btn-default btn-lg" ng-click="">
+				  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Consultation Copay Amount
+				</button>
+				<div>
+				
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{}}</textarea>
+					</p>
+				</div>
+			</div>
+		</div>
+		-->
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Post /healthplan/{healthPlanID}/apply
+				<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-healthplan-id-apply"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+			</div>
+			<div class="panel-body" id="ConsultationSave">
+				<button type="button" class="btn btn-default btn-lg" ng-click="doPostApplyHealthPlan();">
+				  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Post Apply Health Plan
+				</button>
+				<div>
+					<label>InsuranceCompanyName:</label>
+					<input ng-model="insuranceCompanyNameApply" class="form-control input-sm" type="text">	
+					<label>PolicyNumber:</label>
+					<input ng-model="policyNumberApply" class="form-control input-sm" type="text">
+					<label>ConsultationId:</label>
+					<input ng-model="consultationIdApply" class="form-control input-sm" type="text">
+					<label>healthplan id:</label>
+					<input ng-model="healthPlanIdApply" class="form-control input-sm" type="text">					
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{ApplyHealthPlan}}</textarea>
+					</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET v2/patients/profile/{patientId}/payments?hospitalId={hospitalId}
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-patients-profile-userId-payments_hospitalId"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetPatientPaymentProfiles();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Patient Payment Profiles
+                </button>
+				<div>
+					<label>Patient ID:</label>
+					<input ng-model="patientId" class="form-control input-sm" type="text">
+					<label>Hospital ID:</label>
+					<input ng-model="hospitalId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{patientPaymentProfiles}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                POST patients/copay
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-patients-copay"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doPostCoPayDetails();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> POST patients/copay
+                </button>
+				<div>
+					<label>ProfileId:</label>
+					<input ng-model="profileId" class="form-control input-sm" type="text">
+					<label>Email:</label>
+					<input ng-model="emailAddress" class="form-control input-sm" type="text">
+					<label>Amount:</label>
+					<input ng-model="Amount" class="form-control input-sm" type="text">
+					<label>ConsultationId:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<label>PaymentProfileId:</label>
+					<input ng-model="paymentProfileId" class="form-control input-sm" type="text">
+					
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{CreditCardDetails}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+               POST /Soapnotes/Post <!--/patientconsultation/soapnote-->
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doPostPatientSoapNote();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Post Soap Note
+                </button>
+				<div>
+					<label>ConsultationID:</label>
+					<input ng-model="soap_consult_id" class="form-control input-sm" type="text" value="147">
+					<label>PatientID:</label>
+					<input ng-model="patientId" class="form-control input-sm" type="text">
+					<label>UserID:</label>
+					<input ng-model="userId" class="form-control input-sm" type="text">
+					<label>Subjective:</label>
+					<input ng-model="soap_subjective_note" class="form-control input-sm" type="text">
+					<label>Objective:</label>
+					<input ng-model="soap_objective_note" class="form-control input-sm" type="text">
+					<label>Assessment:</label>
+					<input ng-model="soap_assessment_note" class="form-control input-sm" type="text">
+					<label>Plan:</label>
+					<input ng-model="soap_plan_note" class="form-control input-sm" type="text">
+					<!--<label>CptCode:</label>
+					<input ng-model="soap_CptCode" class="form-control input-sm" type="text">	-->						
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{Soap_Note}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                PUT /v2/patients/consultations/{consultationId}/intake
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-healthplan-provider"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="ConsultationSave">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doPutConsultationSave();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Consultation Save
+                </button>
+				<div>
+					<label>Consultation ID:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{ConsultationSave}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+				
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET /healthplan/provider
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-healthplan-provider"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="ConsultationSave">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetHealthPlanProvider();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get health plan providers
+                </button>
+				<div>
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{HealthPlanProvider}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Post /healthplan
+				<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-healthplan"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+			</div>
+			<div class="panel-body" id="ConsultationSave">
+				<button type="button" class="btn btn-default btn-lg" ng-click="doPostNewHealthPlan();">
+				  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Post New Health Plan
+				</button>
+				<div>
+					<label>HealthPlanId:</label>
+					<input ng-model="healthPlanID" class="form-control input-sm" type="text">
+					<label>PatientId:</label>
+					<input ng-model="patientId" class="form-control input-sm" type="text">
+					<label>InsuranceCompany:</label>
+					<input ng-model="insuranceCompany" class="form-control input-sm" type="text">	
+					<label>InsuranceCompanyNameId:</label>
+					<input ng-model="insuranceCompanyNameId" class="form-control input-sm" type="text">
+					<label>IsDefaultPlan:</label>
+					<input ng-model="isDefaultPlan" class="form-control input-sm" type="text">	
+					<label>InsuranceCompanyPhone:</label>
+					<input ng-model="insuranceCompanyPhone" class="form-control input-sm" type="text">	
+					<label>MemberName:</label>
+					<input ng-model="memberName" class="form-control input-sm" type="text">	
+					<label>SubsciberId:</label>
+					<input ng-model="subsciberId" class="form-control input-sm" type="text">	
+					<label>PolicyNumber:</label>
+					<input ng-model="policyNumber" class="form-control input-sm" type="text">	
+					<label>SubscriberFirstName:</label>
+					<input ng-model="subscriberFirstName" class="form-control input-sm" type="text">	
+					<label>SubscriberLastName:</label>
+					<input ng-model="subscriberLastName" class="form-control input-sm" type="text">	
+					<label>SubscriberDob:</label>
+					<input ng-model="subscriberDob" class="form-control input-sm" type="text">	
+					<label>IsActive:</label>
+					<input ng-model="isActive" class="form-control input-sm" type="text">
+					<label>PayerId:</label>
+					<input ng-model="payerId" class="form-control input-sm" type="text">						
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{NewHealthPlan}}</textarea>
+					</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET reports/consultationreportdetails/{consultationId}
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-reports-consultationreportdetails-id"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetExistingConsulatationReport();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Consultation Report
+                </button>
+				<div>
+					<label>Consultation ID:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{existingConsultationReport}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>	
+		
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                POST v2/patients/payments
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-v2-patients-payments"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doPostPaymentProfileDetails();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> POST patient payment profile
+                </button>
+				<div>
+					<label>Patient Email:</label>
+					<input ng-model="patientEmail" class="form-control input-sm" type="text">	
+					<label>BillingAddress:</label>
+					<input ng-model="BillingAddress" class="form-control input-sm" type="text">	
+					<label>CardNumber:</label>
+					<input ng-model="CardNumber" class="form-control input-sm" type="text">			
+					<label>City:</label>
+					<input ng-model="City" class="form-control input-sm" type="text">	
+					<label>ExpiryMonth:</label>
+					<input ng-model="ExpiryMonth" class="form-control input-sm" type="text">	
+					<label>ExpiryYear:</label>
+					<input ng-model="ExpiryYear" class="form-control input-sm" type="text">	
+					<label>FirstName:</label>
+					<input ng-model="FirstName" class="form-control input-sm" type="text">
+					<label>LastName:</label>
+					<input ng-model="LastName" class="form-control input-sm" type="text">	
+					<label>State:</label>
+					<input ng-model="State" class="form-control input-sm" type="text">	
+					<label>Zip:</label>
+					<input ng-model="Zip" class="form-control input-sm" type="text">	
+					<label>Country:</label>
+					<input ng-model="Country" class="form-control input-sm" type="text">
+					<label>ProfileId:</label>
+					<input ng-model="profileId" class="form-control input-sm" type="text">
+					<label>Cvv:</label>
+					<input ng-model="Cvv" class="form-control input-sm" type="text">	
+					
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{PostPaymentDetails}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET v2/patients/profiles/{patientId}
+				<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-patients-profiles-patientId"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetPatientsProfile();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get patient profile
+                </button>
+				<div>
+					<label>Patient Id:</label>
+					<input ng-model="patientId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{PatientsProfile}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                POST v2/patients/consultations
+				<a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-v2-patients-consultations"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doPostOnDemandConsultation();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Post On-Demand Request
+                </button>
+				<div>
+					<label>Patient Id:</label>
+					<input ng-model="patientId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{OnDemandConsultationSaveResult}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET v2/physicians/appointments/{id}/videokey
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/GET-v2-patients-consultations-consultationId-all"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetConsultationKey();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Existing Consultation key
+                </button>
+				<div>
+					<label>Consultation ID:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{ConsultationKey}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                DELETE Payments/Delete/{id}
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/DELETE-Payments-Delete-id"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body">
+                <button type="button" disabled class="btn btn-default btn-lg" ng-click="doDeletePaymentProfile();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Delete payment profile
+                </button>
+				<div>
+					<label>Consultation ID:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{PaymentProfileRemoved}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                POST v2/consultations/events
+                <a target="_blank" href="https://sandbox.connectedcare.md/api/Help/Api/POST-v2-consultations-events"><span class="glyphicon glyphicon-question-sign"></span>Help</a>
+            </div>
+            <div class="panel-body">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doPostConsultationEvent();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Post Consultation Event
+                </button>
+				<div>
+					<label>Consultation ID:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<label>Event:</label>
+					<input ng-model="consultationEvent" class="form-control input-sm" type="text">
+					<label>Event Type:</label>
+					<input ng-model="consultationEventType" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{ConsultationEvent}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+<!--	
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                GET /patients/consultations?userId=' + params.patientID
+            </div>
+            <div class="panel-body" id="patientPaymentProfiles">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetPatientsConsultations();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Patients Consultations
+                </button>
+				<div>
+					<label>Patient Id:</label>
+					<input ng-model="patient_Id" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{Patient_Consultations}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+		-->
+<!--		
+
+-->
+<!--		
+		<div class="panel panel-default">
+            <div class="panel-heading">
+                /patients/consultations/' + params.consultationID + '/soapnote'
+            </div>
+            <div class="panel-body" id="ConsultationSave">
+                <button type="button" class="btn btn-default btn-lg" ng-click="doGetPatientsSoapNotes();">
+                  <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Get Soap Notes
+                </button>
+				<div>
+					<label>Consultation ID:</label>
+					<input ng-model="consultationId" class="form-control input-sm" type="text">
+					<p class="someTopSpace">
+						<textarea class="form-control" rows="5">{{SoapNote}}</textarea>
+					</p>
+				</div>
+            </div>
+        </div>
+-->        
+        <p>
+            <input type="button" value="jQuery Token" onclick="getToken();"/>
+        </p>
+    </div><!-- /.container -->
+	
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+<script src="scripts/ui-bootstrap-tpls-0.12.1.min.js"></script>
+<script src="scripts/app_updated.js"></script>
+<script src="scripts/spin.min.js"></script>
+<script src="scripts/angular-spinner.min.js"></script>
+<script src="scripts/angular-loading-spinner.js"></script>
+
+<script>
+    function getToken() {
+        $.ajax({
+            url: 'https://snap-dev.com/api/Account/Token',
+            data: {
+                UserTypeId: 1,// params.userTypeId,
+                HospitalId: 126,// params.hospitalId,
+                Email: 'ben.ross.310.95348@gmail.com', //params.email,
+                Password: 'Password@123'//params.password
+            },
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Developer-Id': '4ce98e9fda3f405eba526d0291a852f0',
+                'X-Api-Key': '1de605089c18aa8318c9f18177facd7d93ceafa5'
+            },
+            success: function (data) {
+                alert('Success!!');
+                console.log(data);
+            },
+            error: function (data) {
+                alert('Failed!!');
+                console.log(data);
+            }
+        });
+    }
+</script>
+</html>
